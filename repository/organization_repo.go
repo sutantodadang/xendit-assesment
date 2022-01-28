@@ -12,6 +12,7 @@ import (
 type IOrganizationRepository interface {
 	Save(org models.Organization) error
 	Find(id primitive.ObjectID) (models.Organization, error)
+	FindName(name string) (models.Organization, error)
 }
 
 type OrganizationRepo struct {
@@ -44,4 +45,17 @@ func (r *OrganizationRepo) Find(id primitive.ObjectID) (models.Organization, err
 
 	return result, nil
 
+}
+
+func (r *OrganizationRepo) FindName(name string) (models.Organization, error) {
+
+	res := r.db.Collection("organization").FindOne(context.Background(), bson.M{"name": name})
+
+	var result models.Organization
+
+	if err := res.Decode(&result); err != nil {
+		return models.Organization{}, err
+	}
+
+	return result, nil
 }

@@ -2,6 +2,7 @@ package services
 
 import (
 	"reflect"
+	"time"
 	"xendit/models"
 	"xendit/repository"
 
@@ -24,13 +25,16 @@ func (s *OrganizationService) CreateOrg(org models.Organization) error {
 
 	res, err := s.repo.Find(org.Id)
 
-	if reflect.ValueOf(res).IsNil() {
-		return fiber.NewError(fiber.StatusNotFound, "Not Found Organization Data")
+	if reflect.ValueOf(res).IsValid() {
+		return fiber.NewError(fiber.StatusBadRequest, "Organization Data Already Created")
 	}
 
 	if err != nil {
 		return err
 	}
+
+	org.CreatedAt = time.Now()
+	org.UpdatedAt = time.Now()
 
 	if err := s.repo.Save(org); err != nil {
 		return err
