@@ -1,0 +1,32 @@
+version: '3.9'
+services:
+  xendit:
+    build: .
+    ports:
+      - 8001:8001
+    volumes:
+      - .:/app
+    depends_on:
+      - mongo
+    networks:
+      - xendit-app
+
+  mongo:
+    image: mongo
+    environment: 
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+
+    volumes:
+      - mongo-db:/data/db
+    ports:
+      - 27017:27017
+    networks:
+      - xendit-app
+
+volumes:
+  mongo-db:
+
+networks:
+  xendit-app:
+    driver: bridge
