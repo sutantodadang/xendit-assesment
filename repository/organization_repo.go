@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"strings"
 	"xendit/models"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -11,8 +12,8 @@ import (
 
 type IOrganizationRepository interface {
 	Save(org models.Organization) error
-	Find(id primitive.ObjectID) (models.Organization, error)
-	FindName(name string) (models.Organization, error)
+	FindById(id primitive.ObjectID) (models.Organization, error)
+	FindByName(name string) (models.Organization, error)
 }
 
 type OrganizationRepo struct {
@@ -24,6 +25,7 @@ func NewOrganizationRepository(db *mongo.Database) *OrganizationRepo {
 }
 
 func (r *OrganizationRepo) Save(org models.Organization) error {
+
 	_, err := r.db.Collection("organization").InsertOne(context.Background(), &org)
 
 	if err != nil {
@@ -33,7 +35,7 @@ func (r *OrganizationRepo) Save(org models.Organization) error {
 	return nil
 }
 
-func (r *OrganizationRepo) Find(id primitive.ObjectID) (models.Organization, error) {
+func (r *OrganizationRepo) FindById(id primitive.ObjectID) (models.Organization, error) {
 
 	res := r.db.Collection("organization").FindOne(context.Background(), bson.M{"_id": id})
 
@@ -47,9 +49,9 @@ func (r *OrganizationRepo) Find(id primitive.ObjectID) (models.Organization, err
 
 }
 
-func (r *OrganizationRepo) FindName(name string) (models.Organization, error) {
+func (r *OrganizationRepo) FindByName(name string) (models.Organization, error) {
 
-	res := r.db.Collection("organization").FindOne(context.Background(), bson.M{"name": name})
+	res := r.db.Collection("organization").FindOne(context.Background(), bson.M{"name": strings.ToLower(name)})
 
 	var result models.Organization
 

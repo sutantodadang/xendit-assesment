@@ -25,7 +25,7 @@ func NewCommentService(repo *repository.CommentRepository, orgrepo *repository.O
 
 func (s *CommentService) CreateCommentService(comment models.InputComment, param string) error {
 
-	org, err := s.orgrepo.FindName(param)
+	org, err := s.orgrepo.FindByName(param)
 
 	if reflect.ValueOf(org).IsNil() {
 		return fiber.NewError(fiber.StatusNotFound, "Organization Data Not Found")
@@ -55,7 +55,7 @@ func (s *CommentService) CreateCommentService(comment models.InputComment, param
 
 func (s *CommentService) GetAllCommentByOrg(param string) ([]models.Comment, error) {
 
-	org, err := s.orgrepo.FindName(param)
+	org, err := s.orgrepo.FindByName(param)
 
 	if reflect.ValueOf(org).IsNil() {
 		return nil, fiber.NewError(fiber.StatusNotFound, "Organization Data Not Found")

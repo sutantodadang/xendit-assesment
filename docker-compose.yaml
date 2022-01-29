@@ -3,7 +3,7 @@ services:
   xendit:
     build: .
     ports:
-      - 8001:8001
+      - 8050:8050
     volumes:
       - .:/app
     depends_on:

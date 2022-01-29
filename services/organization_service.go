@@ -1,7 +1,7 @@
 package services
 
 import (
-	"reflect"
+	"strings"
 	"time"
 	"xendit/models"
 	"xendit/repository"
@@ -10,7 +10,7 @@ import (
 )
 
 type IOrganizationService interface {
-	CreateOrg(org models.Organization) error
+	CreateOrg(name models.InputOrganization) error
 }
 
 type OrganizationService struct {
@@ -21,20 +21,19 @@ func NewOrganizationService(repo *repository.OrganizationRepo) *OrganizationServ
 	return &OrganizationService{repo}
 }
 
-func (s *OrganizationService) CreateOrg(org models.Organization) error {
+func (s *OrganizationService) CreateOrg(input models.InputOrganization) error {
 
-	res, err := s.repo.Find(org.Id)
+	res, _ := s.repo.FindByName(input.Name)
 
-	if reflect.ValueOf(res).IsValid() {
+	if strings.ToLower(res.Name) == strings.ToLower(input.Name) {
 		return fiber.NewError(fiber.StatusBadRequest, "Organization Data Already Created")
 	}
 
-	if err != nil {
-		return err
-	}
+	var org models.Organization
 
 	org.CreatedAt = time.Now()
 	org.UpdatedAt = time.Now()
+	org.Name = input.Name
 
 	if err := s.repo.Save(org); err != nil {
 		return err

@@ -3,6 +3,7 @@ package handlers
 import (
 	"xendit/models"
 	"xendit/services"
+	"xendit/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -17,15 +18,21 @@ func NewOrganizationHandler(service *services.OrganizationService) *Organization
 
 func (h *OrganizationHandler) CreateOrganizationHandler(c *fiber.Ctx) error {
 
-	org := new(models.Organization)
+	name := new(models.InputOrganization)
 
-	if err := c.BodyParser(org); err != nil {
+	if err := c.BodyParser(name); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": err,
 		})
 	}
 
-	if err := h.service.CreateOrg(*org); err != nil {
+	if err := utils.ValidateStruct(name); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": err,
+		})
+	}
+
+	if err := h.service.CreateOrg(*name); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": err,
 		})

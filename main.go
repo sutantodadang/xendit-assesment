@@ -42,6 +42,6 @@ func main() {
 	routeOrg.OrgRoute(app)
 	routeComment.RouteComment(app)
 
-	log.Fatal(app.Listen(""))
+	log.Fatal(app.Listen(":8050"))
 
 }

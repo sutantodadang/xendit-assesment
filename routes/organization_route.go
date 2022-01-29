@@ -16,7 +16,7 @@ func NewOrganizationRoute(handler *handlers.OrganizationHandler) *OrganizationRo
 
 func (rt *OrganizationRoute) OrgRoute(app *fiber.App) {
 
-	route := app.Group("api/v1/orgs/")
+	route := app.Group("/api/v1/orgs")
 
 	route.Post("/", rt.handler.CreateOrganizationHandler)
 }
