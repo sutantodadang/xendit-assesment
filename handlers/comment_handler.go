@@ -21,7 +21,7 @@ func (h *CommentHandler) CreateCommentHandler(c *fiber.Ctx) error {
 
 	if param == "" {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"message": "param not found",
+			"message": "parameter not found",
 		})
 	}
 
@@ -42,4 +42,27 @@ func (h *CommentHandler) CreateCommentHandler(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"message": "comment successfully added",
 	})
+}
+
+func (h *CommentHandler) GetAllComment(c *fiber.Ctx) error {
+
+	param := c.Params("organization")
+
+	if param == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "parameter not found",
+		})
+	}
+
+	res, err := h.service.GetAllCommentByOrg(param)
+
+	if err != nil {
+		return err
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "success",
+		"data":    res,
+	})
+
 }

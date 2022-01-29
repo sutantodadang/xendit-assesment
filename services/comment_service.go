@@ -11,6 +11,7 @@ import (
 
 type ICommentService interface {
 	CreateComment(comment models.InputComment, param string) error
+	GetAllCommentByOrg(param string) ([]models.Comment, error)
 }
 
 type CommentService struct {
@@ -49,5 +50,27 @@ func (s *CommentService) CreateCommentService(comment models.InputComment, param
 	}
 
 	return nil
+
+}
+
+func (s *CommentService) GetAllCommentByOrg(param string) ([]models.Comment, error) {
+
+	org, err := s.orgrepo.FindName(param)
+
+	if reflect.ValueOf(org).IsNil() {
+		return nil, fiber.NewError(fiber.StatusNotFound, "Organization Data Not Found")
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := s.repo.FindAll(org)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 
 }

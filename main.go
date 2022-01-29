@@ -23,13 +23,24 @@ func main() {
 
 	defer db.CloseDB()
 
-	repo := repository.NewOrganizationRepository(client)
-	service := services.NewOrganizationService(repo)
-	handler := handlers.NewOrganizationHandler(service)
+	// repository
+	repoOrg := repository.NewOrganizationRepository(client)
+	repoComment := repository.NewCommentRepository(client)
 
-	org := routes.NewOrganizationRoute(handler)
+	// service
+	serviceOrg := services.NewOrganizationService(repoOrg)
+	serviceComment := services.NewCommentService(repoComment, repoOrg)
 
-	org.OrgRoute(app)
+	// handler
+	handlerOrg := handlers.NewOrganizationHandler(serviceOrg)
+	handlerComment := handlers.NewCommentHandler(serviceComment)
+
+	// route
+	routeOrg := routes.NewOrganizationRoute(handlerOrg)
+	routeComment := routes.NewCommentRoute(handlerComment)
+
+	routeOrg.OrgRoute(app)
+	routeComment.RouteComment(app)
 
 	log.Fatal(app.Listen(""))
 

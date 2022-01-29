@@ -16,7 +16,8 @@ func NewCommentRoute(handler *handlers.CommentHandler) *CommentRoute {
 
 func (rt *CommentRoute) RouteComment(app *fiber.App) {
 
-	route := app.Group("api/v1/:organization/comment")
+	route := app.Group("api/v1/orgs/:organization/comment")
 
 	route.Post("/", rt.handler.CreateCommentHandler)
+	route.Get("/", rt.handler.GetAllComment)
 }
