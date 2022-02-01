@@ -7,7 +7,7 @@ import (
 )
 
 type Comment struct {
-	Id           primitive.ObjectID `json:"id" bson:"_id"`
+	Id           primitive.ObjectID `json:"id" bson:"_id,omitempty"`
 	Message      string             `json:"message" bson:"message"`
 	Organization Organization       `json:"organization" bson:"organization"`
 	CreatedAt    time.Time          `json:"created_at" bson:"created_at"`
@@ -15,5 +15,5 @@ type Comment struct {
 }
 
 type InputComment struct {
-	Message string `json:"message" bson:"message"`
+	Message string `json:"message" validate:"required,min=2" bson:"message"`
 }

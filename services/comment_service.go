@@ -1,7 +1,6 @@
 package services
 
 import (
-	"reflect"
 	"time"
 	"xendit/models"
 	"xendit/repository"
@@ -12,6 +11,7 @@ import (
 type ICommentService interface {
 	CreateComment(comment models.InputComment, param string) error
 	GetAllCommentByOrg(param string) ([]models.Comment, error)
+	DeleteAllByOrg(org string) error
 }
 
 type CommentService struct {
@@ -25,25 +25,18 @@ func NewCommentService(repo *repository.CommentRepository, orgrepo *repository.O
 
 func (s *CommentService) CreateCommentService(comment models.InputComment, param string) error {
 
-	org, err := s.orgrepo.FindByName(param)
+	org, _ := s.orgrepo.FindByName(param)
 
-	if reflect.ValueOf(org).IsNil() {
+	if org.Id.String() == "" {
 		return fiber.NewError(fiber.StatusNotFound, "Organization Data Not Found")
-	}
-
-	if err != nil {
-		return err
 	}
 
 	var data models.Comment
 
 	data.Message = comment.Message
-	data.Organization.Id = org.Id
-	data.Organization.Name = org.Name
-	data.Organization.CreatedAt = org.CreatedAt
-	data.Organization.UpdatedAt = org.UpdatedAt
-	data.CreatedAt = time.Now()
-	data.UpdatedAt = time.Now()
+	data.Organization = org
+	data.CreatedAt = time.Now().UTC()
+	data.UpdatedAt = time.Now().UTC()
 
 	if err := s.repo.Save(data); err != nil {
 		return err
@@ -55,14 +48,10 @@ func (s *CommentService) CreateCommentService(comment models.InputComment, param
 
 func (s *CommentService) GetAllCommentByOrg(param string) ([]models.Comment, error) {
 
-	org, err := s.orgrepo.FindByName(param)
+	org, _ := s.orgrepo.FindByName(param)
 
-	if reflect.ValueOf(org).IsNil() {
+	if org.Id.String() == "" {
 		return nil, fiber.NewError(fiber.StatusNotFound, "Organization Data Not Found")
-	}
-
-	if err != nil {
-		return nil, err
 	}
 
 	res, err := s.repo.FindAll(org)
@@ -73,4 +62,35 @@ func (s *CommentService) GetAllCommentByOrg(param string) ([]models.Comment, err
 
 	return res, nil
 
+}
+
+func (s *CommentService) DeleteAllByOrg(org string) error {
+
+	res, _ := s.orgrepo.FindByName(org)
+
+	if res.Id.String() == "" {
+		return fiber.ErrNotFound
+	}
+
+	comment, err := s.repo.FindAll(res)
+
+	if err != nil {
+		return err
+	}
+
+	var dump []interface{}
+
+	for _, v := range comment {
+		dump = append(dump, v)
+	}
+
+	if err := s.repo.SaveDump(dump); err != nil {
+		return err
+	}
+
+	if err := s.repo.DeleteAll(res); err != nil {
+		return err
+	}
+
+	return nil
 }

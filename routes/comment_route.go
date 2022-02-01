@@ -20,4 +20,5 @@ func (rt *CommentRoute) RouteComment(app *fiber.App) {
 
 	route.Post("/", rt.handler.CreateCommentHandler)
 	route.Get("/", rt.handler.GetAllComment)
+	route.Delete("/", rt.handler.DeleteAllHandler)
 }

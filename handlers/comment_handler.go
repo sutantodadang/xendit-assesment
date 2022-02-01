@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"xendit/helpers"
 	"xendit/models"
 	"xendit/services"
+	"xendit/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -33,6 +35,12 @@ func (h *CommentHandler) CreateCommentHandler(c *fiber.Ctx) error {
 		})
 	}
 
+	if err := utils.ValidateStruct(comment); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": err,
+		})
+	}
+
 	if err := h.service.CreateCommentService(*comment, param); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": err,
@@ -57,12 +65,32 @@ func (h *CommentHandler) GetAllComment(c *fiber.Ctx) error {
 	res, err := h.service.GetAllCommentByOrg(param)
 
 	if err != nil {
-		return err
+		return c.Status(fiber.StatusNotFound).JSON(err)
+	}
+
+	response := helpers.ApiResponse("success", fiber.StatusOK, res)
+
+	return c.Status(fiber.StatusOK).JSON(response)
+}
+
+func (h *CommentHandler) DeleteAllHandler(c *fiber.Ctx) error {
+
+	param := c.Params("organization")
+
+	if param == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "parameter not found",
+		})
+	}
+
+	if err := h.service.DeleteAllByOrg(param); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": err,
+		})
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"message": "success",
-		"data":    res,
+		"message": "successfully deleted",
 	})
 
 }

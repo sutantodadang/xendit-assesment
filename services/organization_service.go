@@ -33,7 +33,7 @@ func (s *OrganizationService) CreateOrg(input models.InputOrganization) error {
 
 	org.CreatedAt = time.Now()
 	org.UpdatedAt = time.Now()
-	org.Name = input.Name
+	org.Name = strings.ToLower(input.Name)
 
 	if err := s.repo.Save(org); err != nil {
 		return err
