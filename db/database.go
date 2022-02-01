@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"log"
+	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -14,7 +15,7 @@ var clientmongo *mongo.Client
 
 func ConnectDB() *mongo.Database {
 
-	opt := options.Client().ApplyURI("mongodb://root:password@mongo:27017/?maxPoolSize=20&w=majority")
+	opt := options.Client().ApplyURI(os.Getenv("MONGODB_URI"))
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 
