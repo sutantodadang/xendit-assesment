@@ -11,7 +11,8 @@ import (
 
 type IMemberRepository interface {
 	Save(member models.Member) error
-	FindAll(org models.Organization) ([]models.Member, error)
+	FindAllByOrg(org models.Organization) ([]models.Member, error)
+	FindByName(name string) (models.Member, error)
 }
 
 type MemberRepository struct {
@@ -33,7 +34,7 @@ func (r *MemberRepository) Save(member models.Member) error {
 	return nil
 }
 
-func (r *MemberRepository) FindAll(org models.Organization) ([]models.Member, error) {
+func (r *MemberRepository) FindAllByOrg(org models.Organization) ([]models.Member, error) {
 
 	res, err := r.db.Collection("members").Find(context.Background(), bson.M{"organization": org})
 
@@ -49,6 +50,20 @@ func (r *MemberRepository) FindAll(org models.Organization) ([]models.Member, er
 
 	if len(result) == 0 {
 		return nil, fiber.ErrNotImplemented
+	}
+
+	return result, nil
+
+}
+
+func (r *MemberRepository) FindByName(name string) (models.Member, error) {
+
+	res := r.db.Collection("members").FindOne(context.Background(), bson.M{"name": name})
+
+	var result models.Member
+
+	if err := res.Decode(&result); err != nil {
+		return models.Member{}, err
 	}
 
 	return result, nil
